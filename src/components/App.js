@@ -1,45 +1,44 @@
-
 import React, { useEffect, useState } from "react";
 import './../styles/App.css';
 
 const App = () => {
-
-
-  const[text, setText] = useState()
-
-  // useEffect(() => {
-  //   const getData = async() => {
-  //     const data = await fetch("https://dummyjson.com/products")
-  //     const json = await data.json()
-  //     setText(json)
-  //   }
-  //   getData()
-  // }, [])
+  const [text, setText] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const getData = () => {
-      fetch("https://dummyjson.com/products")
-        .then((data) => data.json())
-        .then((json) => {
-          setText(json);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        });
-    };
-
-    getData();
+    fetch("https://dummyjson.com/products")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((json) => {
+        setText(json);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError(error.message);
+        setLoading(false);
+      });
   }, []);
 
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
 
+  if (error) {
+    return <h1>An error occurred: {error}</h1>;
+  }
 
   return (
     <div>
-        <pre>
-         {JSON.stringify(text, null, 2)}
-        </pre>
+      <pre>
+        {JSON.stringify(text, null, 2)}
+      </pre>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
